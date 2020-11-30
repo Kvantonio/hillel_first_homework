@@ -1,34 +1,36 @@
-def parse(url: str) -> dict:
+def parse_cookie(cookie: str) -> dict:
     d = {}
-    if len(url) == 0: return {}
-    if url.count('?') == 0: return {}
-    if url.split('?', 1)[1] == '': return {}
-    url = url.split('?')[1].split('&')
-    for i in range(len(url)):
-        if url[i] == '': continue
-        if url[i].count('=') == 0:
-            d[url[i].split('=', 1)[0]] = ""
+    if len(cookie) == 0: return {}
+    cookie = cookie.split(';')
+    for i in range(len(cookie)):
+        if cookie[i] == '':
             continue
-        d[url[i].split('=', 1)[0]] = url[i].split('=', 1)[1]
+        for j in range(len(cookie[i])):
+            if cookie[i].count('=')==0:
+                d[cookie[i]] = ''
+                continue
+            if cookie[i].split('=', 1)[0] == '':
+                continue
+            d[cookie[i].split('=', 1)[0]] = cookie[i].split('=',1)[1]
     return d
 
 
-if __name__ == '__main__':
-    assert parse('https://example.com/path/to/page?name=ferret&color=purple') == {'name': 'ferret', 'color': 'purple'}
-    assert parse('https://example.com/path/to/page?name=ferret&color=purple&') == {'name': 'ferret', 'color': 'purple'}
-    assert parse('http://example.com/') == {}
-    assert parse('http://example.com/?') == {}
-    assert parse('http://example.com/?name=Dima') == {'name': 'Dima'}
 
-    assert parse('') == {}
-    assert parse('?') == {}
-    assert parse('&') == {}
-    assert parse('https://www.youtube.com/watch?v')
-    assert parse('https://www.youtube.com/watch?v=fgf&g&user=ghhfv') == {'v': 'fgf', 'g': '', 'user': 'ghhfv'}
-    assert parse('https://www.youtube.com/watch?v=1PHGmatiaME') == {'v': '1PHGmatiaME'}
-    assert parse('https://www.youtube.com/?v=1P&&user=ff') == {'v': '1P', 'user': 'ff'}
-    assert parse('https://www.youtube.com/watch?v=1PHGmatiaME=26s') == {'v': '1PHGmatiaME=26s'}
-    assert parse('https://www.youtube.com/watch?v=1PHGmatiaME=26s&n=h=j') == {'v': '1PHGmatiaME=26s', 'n':'h=j'}
-    assert parse('https://stepik.org/lesson/3380/step/2?unit=963') == {'unit': '963'}
-    assert parse('https://www.google.com/search?client=opera-gx&q=anaconda+import+requests&sourceid=opera') == {'client': 'opera-gx', 'q': 'anaconda+import+requests', 'sourceid': 'opera'}
+
+if __name__ == '__main__':
+    assert parse_cookie('name=Dima;') == {'name': 'Dima'}
+    assert parse_cookie('') == {}
+    assert parse_cookie('name=Dima;age=28;') == {'name': 'Dima', 'age': '28'}
+    assert parse_cookie('name=Dima=User;age=28;') == {'name': 'Dima=User', 'age': '28'}
+
+    assert parse_cookie('name;') == {'name': ''}
+    assert parse_cookie('name=Dima;lastname;') == {'name': 'Dima', 'lastname': ''}
+    assert parse_cookie(';') == {}
+    assert parse_cookie('name=Dima;;') == {'name': 'Dima'}
+    assert parse_cookie('=') == {}
+    assert parse_cookie('=;') == {}
+    assert parse_cookie('mail=i.ua;=;') == {'mail': 'i.ua'}
+    assert parse_cookie('mail==') == {'mail': '='}
+    assert parse_cookie('name=Dima;mail=') == {'name': 'Dima', 'mail': ''}
+    assert parse_cookie('?n') == {'?n': ''}
 
